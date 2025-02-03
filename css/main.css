@@ -56,6 +56,10 @@ button {
     font-size: 14px;
 }
 
+button:hover {
+    color: #0e7f76;
+}
+
 .disabledButton {
     background-color: #d8d8d8;
 }
