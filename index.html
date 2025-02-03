@@ -22,7 +22,7 @@
 
             <div class="product-info">
                 <div style="display: flex; gap: 20px; align-items: center">
-                    <h1>{{ product }}</h1>
+                    <h1>{{ title }}</h1>
                     <p v-if="inStock">In Stock</p>
                     <p v-else-if="inventory <= 10 && inventory > 0">Almost sold out!</p>
                     <p v-else :class="{ text_through: !inStock }">Out of Stock</p>
@@ -30,6 +30,7 @@
                         <p>Cart({{ cart }})</p>
                     </div>
                 </div>
+                <p v-if="onSale">{{ sale }}</p>
                 <span v-if="inventory <= 30 && inventory > 0">On Sale</span><br>
                 <ul>
                     <li v-for="detail in details">{{ detail }}</li>
@@ -37,10 +38,10 @@
                 <div style="display: flex; gap: 20px; margin-left: 20px">
                     <div
                             class="color-box"
-                            v-for="variant in variants"
+                            v-for="(variant, index) in variants"
                             :key="variant.variantId"
                             :style="{ backgroundColor:variant.variantColor }"
-                            @mouseover="updateProduct(variant.variantImage)"
+                            @mouseover="updateProduct(index)"
                     >
                     </div>
                 </div>
