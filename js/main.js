@@ -11,9 +11,6 @@ Vue.component('product', {
                 <p v-if="inStock">In Stock</p>
                 <p v-else-if="inventory <= 10 && inventory > 0">Almost sold out!</p>
                 <p v-else :class="{ text_through: !inStock }">Out of Stock</p>
-                <div class="cart">
-                    <p>Cart({{ cart }})</p>
-                </div>
             </div>
             <p v-if="onSale">{{ sale }}</p>
             <span v-if="inventory <= 30 && inventory > 0">On Sale</span><br>
@@ -81,17 +78,19 @@ Vue.component('product', {
                 }
             ],
             sizes: ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
-            cart: 0,
+            cart: [],
             selectedVariant: 0,
         }
     },
     methods: {
         addToCart() {
-            this.cart += 1
+            this.$emit('add-to-cart',
+            this.variants[this.selectedVariant].variantId);
         },
         delToCart() {
-            if (this.cart === 0) this.cart = 0
-            else this.cart -= 1
+            this.$emit('del-to-cart',
+            this.variants[this.selectedVariant].variantId);
+            if (this.cart.length === 0) this.cart.length = 0
         },
         updateProduct(index) {
             this.selectedVariant = index;
@@ -128,5 +127,14 @@ let app = new Vue({
     el: '#app',
     data: {
         premium: true,
-    }
+        cart: [],
+    },
+    methods: {
+        updateCart(id) {
+            this.cart.push(id);
+        },
+        deleteCart(id){
+            this.cart.pop();
+        }
+    },
 })
