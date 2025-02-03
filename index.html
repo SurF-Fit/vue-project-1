@@ -21,7 +21,13 @@
             </div>
 
             <div class="product-info">
-                <h1>{{ product }}</h1>
+                <div style="display: flex; gap: 20px; align-items: center">
+                    <h1>{{ product }}</h1>
+                    <p v-if="inStock">In Stock</p>
+                    <p v-else-if="inventory <= 10 && inventory > 0">Almost sold out!</p>
+                    <p v-else>Out of Stock</p>
+                </div>
+                <span v-if="inventory <= 30 && inventory > 0">On Sale</span><br>
                 <a v-bind:href="link">More products like this</a>
             </div>
 
