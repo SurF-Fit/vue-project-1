@@ -1,18 +1,6 @@
 let product = "Socks";
 
 let app = new Vue({
-    methods: {
-        addToCart() {
-            this.cart += 1
-        },
-        delToCart() {
-            if (this.cart === 0) this.cart = 0
-            else this.cart -= 1
-        },
-        updateProduct(variantImage) {
-            this.image = variantImage
-        },
-    },
     el: '#app',
     data:{
         product: "Socks",
@@ -35,5 +23,17 @@ let app = new Vue({
         ],
         sizes: ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
         cart: 0,
-    }
+    },
+    methods: {
+        addToCart() {
+            this.cart += 1
+        },
+        delToCart() {
+            if (this.cart === 0) this.cart = 0
+            else this.cart -= 1
+        },
+        updateProduct(variantImage) {
+            this.image = variantImage
+        },
+    },
 })

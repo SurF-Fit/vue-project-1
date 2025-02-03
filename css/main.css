@@ -64,6 +64,10 @@ button:hover {
     background-color: #d8d8d8;
 }
 
+.text_through {
+    text-decoration: line-through;
+}
+
 .review-form {
     width: 400px;
     padding: 20px;
