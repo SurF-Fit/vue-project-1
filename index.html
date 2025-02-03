@@ -11,53 +11,10 @@
     <title>Product App</title>
 </head>
 <body>
-<div id="app">
     <div id="app">
-
-        <div class="product">
-
-            <div class="product-image">
-                <img v-bind:alt="allText" v-bind:src="image">
-            </div>
-
-            <div class="product-info">
-                <div style="display: flex; gap: 20px; align-items: center">
-                    <h1>{{ title }}</h1>
-                    <p v-if="inStock">In Stock</p>
-                    <p v-else-if="inventory <= 10 && inventory > 0">Almost sold out!</p>
-                    <p v-else :class="{ text_through: !inStock }">Out of Stock</p>
-                    <div class="cart">
-                        <p>Cart({{ cart }})</p>
-                    </div>
-                </div>
-                <p v-if="onSale">{{ sale }}</p>
-                <span v-if="inventory <= 30 && inventory > 0">On Sale</span><br>
-                <ul>
-                    <li v-for="detail in details">{{ detail }}</li>
-                </ul>
-                <div style="display: flex; gap: 20px; margin-left: 20px">
-                    <div
-                            class="color-box"
-                            v-for="(variant, index) in variants"
-                            :key="variant.variantId"
-                            :style="{ backgroundColor:variant.variantColor }"
-                            @mouseover="updateProduct(index)"
-                    >
-                    </div>
-                </div>
-                <div style="display: flex; gap: 20px; margin-left: 20px">
-                    <div v-for="size in sizes">
-                        <a style="color: black; text-decoration: none" href="#">{{ size }}</a>
-                    </div>
-                </div>
-                <div style="display: flex; gap: 20px; align-items: center">
-                    <button v-on:click="addToCart" :disabled="!inStock" :class="{ disabledButton: !inStock }">Add to cart</button>
-                    <button v-on:click="delToCart">Delete to cart</button>
-                </div>
-            </div>
-
-        </div>
+        <product :premium="premium"></product>
+        <product :premium="premium"></product>
+        <product></product>
     </div>
-</div>
 </body>
 </html>
