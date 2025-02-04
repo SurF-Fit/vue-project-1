@@ -173,19 +173,17 @@ Vue.component('product', {
                         class="color-box"
                         v-for="(variant, index) in variants"
                         :key="variant.variantId"
-                        :style="{ backgroundColor:variant.variantColor }"
+                        :style="{ backgroundColor: variant.variantColor }"
                         @mouseover="updateProduct(index)"
+                        @dragstart="drag($event, index)"
+                        draggable="true"
                 >
                 </div>
             </div>
-            <div style="display: flex; gap: 20px; margin-left: 20px">
+            <div style="display: flex; gap: 20px; margin-left: 20px; margin-top: 20px">
                 <div v-for="size in sizes">
                     <a style="color: black; text-decoration: none" href="#">{{ size }}</a>
                 </div>
-            </div>
-            <div style="display: flex; gap: 20px; align-items: center">
-                <button v-on:click="addToCart" :disabled="!inStock" :class="{ disabledButton: !inStock }">Add to cart</button>
-                <button v-on:click="delToCart">Delete to cart</button>
             </div>
         </div>
         <product-tabs :reviews="reviews" :shipping="shipping" :product-details="productDetails"></product-tabs>
@@ -194,6 +192,10 @@ Vue.component('product', {
     props: {
         premium: {
             type: Boolean,
+            required: true
+        },
+        cart: {
+            type: Array,
             required: true
         }
     },
@@ -224,35 +226,52 @@ Vue.component('product', {
                     variantId: 2234,
                     variantColor: 'green',
                     variantImage: "./assets/vmSocks-green-onWhite.jpg",
-                    variantQuantity: 10,
+                    variantQuantity: 100,
                 },
                 {
                     variantId: 2235,
                     variantColor: 'blue',
                     variantImage: "./assets/vmSocks-blue-onWhite.jpg",
-                    variantQuantity: 0,
+                    variantQuantity: 100,
                 }
             ],
             sizes: ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
-            cart: [],
             selectedVariant: 0,
             reviews: [],
         }
     },
     methods: {
         addToCart() {
-            this.$emit('add-to-cart',
-            this.variants[this.selectedVariant].variantId);
+            const variant = this.variants[this.selectedVariant];
+            if (variant.variantQuantity > 0) {
+                this.$emit('add-to-cart', variant);
+                variant.variantQuantity--;
+            } else {
+                alert(`Sorry, ${variant.variantColor} is out of stock!`);
+            }
         },
         delToCart() {
-            this.$emit('del-to-cart',
-            this.variants[this.selectedVariant].variantId);
-            if (this.cart.length === 0) this.cart.length = 0
+            this.$emit('del-to-cart', this.variants[this.selectedVariant].variantId);
         },
         updateProduct(index) {
             this.selectedVariant = index;
-            console.log(index);
         },
+        drag(event, index) {
+            event.dataTransfer.setData("text/plain", index);
+        },
+        drop(event) {
+            event.preventDefault();
+            const index = event.dataTransfer.getData("text/plain");
+            const variant = this.variants[index];
+            if (variant.variantQuantity > 0) {
+                this.$emit('add-to-cart', variant);
+                alert(`Added ${variant.variantColor} to cart!`);
+            } else
+                alert(`Sorry, ${variant.variantColor} is out of stock!`);
+        },
+        allowDrop(event) {
+            event.preventDefault();
+        }
     },
     computed: {
         title() {
@@ -271,27 +290,83 @@ Vue.component('product', {
             return this.brand + ' ' + this.product + ' ' + "sale"
         },
         shipping() {
-            if (this.premium) {
-                return "Free";
-            } else {
-                return 2.99
-            }
+            return this.premium ? "Free" : 2.99;
         },
     },
 })
 
-let app = new Vue({
+Vue.component('cart', {
+    template: `
+    <div class="cart" @drop="drop" @dragover="allowDrop">
+        <h2>Корзина</h2>
+        <ul>
+            <li v-for="(item, index) in cart" :key="index">
+                {{ item.variantColor }} - {{ item.variantQuantity }}
+              <div style="display: flex; gap: 20px; align-items: center">
+                <button @click="plass(index)">+</button>
+                <button @click="minus(index)" :disabled="item.variantQuantity < 1">-</button>
+              </div>
+            </li>
+        </ul>
+    </div>
+    `,
+    props: {
+        cart: {
+            type: Array,
+            required: true
+        }
+    },
+    methods: {
+        drop(event) {
+            event.preventDefault();
+            const index = event.dataTransfer.getData("text/plain");
+            const variant = this.$parent.$children[0].variants[index];
+            this.$emit('add-to-cart', variant);
+        },
+        allowDrop(event) {
+            event.preventDefault();
+        },
+        plass(index) {
+            const variantId = this.cart[index].variantId;
+            this.$emit('add-to-cart', this.cart[index]);
+        },
+        minus(index) {
+            const variantId = this.cart[index].variantId;
+            this.$emit('del-to-cart', variantId);
+            if (this.cart[index].variantQuantity > 1) {
+                this.cart[index].variantQuantity--;
+            } else {
+                this.removeFromCart(index);
+            }
+        },
+        removeFromCart(index) {
+            const variantId = this.cart[index].variantId;
+            this.$emit('del-to-cart', variantId);
+            this.cart.splice(index, 1);
+        }
+    }
+});
+
+new Vue({
     el: '#app',
     data: {
         premium: true,
         cart: [],
     },
     methods: {
-        updateCart(id) {
-            this.cart.push(id);
+        updateCart(variant) {
+            const existingVariant = this.cart.find(item => item.variantId === variant.variantId);
+            if (existingVariant) {
+                existingVariant.variantQuantity++;
+            } else {
+                this.cart.push({...variant, variantQuantity: 1});
+            }
         },
-        deleteCart(id){
-            this.cart.pop();
+        removeFromCart(id) {
+            const index = this.cart.findIndex(item => item.variantId === id);
+            if (index > -1) {
+                this.cart.splice(id, 1);
+            }
         }
     },
 })

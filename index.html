@@ -11,11 +11,9 @@
     <title>Product App</title>
 </head>
 <body>
-    <div id="app">
-        <div class="cart">
-            <p>Cart({{ cart.length }})</p>
-        </div>
-        <product :premium="premium" @add-to-cart="updateCart" @del-to-cart="deleteCart"></product>
+    <div id="app" style="display: flex;">
+        <product :premium="premium" :cart="cart" @add-to-cart="updateCart" @del-to-cart="removeFromCart"></product>
+        <cart style="width: 300px; height: max-content; text-align: center" :cart="cart" @add-to-cart="updateCart" @del-to-cart="removeFromCart"></cart>
     </div>
 </body>
 </html>
