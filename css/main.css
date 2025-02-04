@@ -91,6 +91,11 @@ textarea {
     cursor: pointer;
 }
 
+.tab:hover{
+    color: #13aea1;
+    text-decoration: underline;
+}
+
 .activeTab {
     color: #16C0B0;
     text-decoration: underline;
